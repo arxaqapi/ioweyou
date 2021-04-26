@@ -212,7 +212,7 @@ def get_precision_recall(TP: int, FP: int, FN: int, TN: int=0) -> Tuple[float, f
     except:
         p = 1
     try:
-        r = TP / (TP / FN)
+        r = TP / (TP + FN)
     except:
         r = 1
     return p, r
