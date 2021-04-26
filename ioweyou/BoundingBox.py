@@ -242,7 +242,7 @@ def precision_recall_curve(
         det_images: List[Image],
         confidence_threshold_values=[0, 0.25, 0.5, 0.75, 1],
         display=False
-        ) -> Tuple[List[float]]:
+        ) -> Tuple[List[float], List[float]]:
     import matplotlib.pyplot as plt
     precicions, recalls = [], []
     for threshold in confidence_threshold_values:
@@ -257,3 +257,14 @@ def precision_recall_curve(
         plt.plot(recalls, precicions, 'r')
         plt.show()
     return precicions, recalls
+
+
+def mAP(precisions: List[float], recalls: List[float]) -> float:
+    import numpy as np
+    eps = 1e-2
+    matrix = np.array([recalls, precisions]).T
+    assert matrix.shape[1] == 2
+    sorted_order = matrix[:, 0].argsort(axis=0)
+    pr_matrix = matrix[sorted_order]
+    mAP = np.trapz(pr_matrix[:, 1] + eps, x=(pr_matrix[:, 0] + eps))
+    return mAP - eps

@@ -16,7 +16,7 @@ PATH = "data/bird_dataset/"
 def evaluate_yolov4():
     from ioweyou.interface import import_bird_dataset
     from ioweyou.interface import parse_yolov4_results_json
-    from ioweyou.BoundingBox import evaluate_model, precision_recall_curve
+    from ioweyou.BoundingBox import evaluate_model, precision_recall_curve, mAP
 
     gt_test, gt_train, gt_val = import_bird_dataset(PATH)
     dt = parse_yolov4_results_json("data/results.json")
@@ -31,6 +31,7 @@ def evaluate_yolov4():
     print(p)
     print("recall")
     print(r)
+    print(f"map = {mAP(precisions=p, recalls=r)}")
     # print(zip(p, r))
 
 
