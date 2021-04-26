@@ -1,5 +1,6 @@
 import os
-import glob as glob
+import json
+from glob import glob 
 
 # for each directory, create a .txt file containing the list of all image paths
 def get_all_images(dir):
@@ -12,6 +13,11 @@ def to_file(file_path, img_list, prefix='../'):
     with open(file_path, 'a+') as f:
         f.writelines(img_list)
 
+
+def get_json(path):
+    with open(path, 'r') as f:
+        data = json.load(f)
+    return data
 # PATH = "bird_dataset/"
 # to_file(PATH + "eval_index.txt", get_all_images(PATH + "val/"))
 # to_file(PATH + "train_index.txt", get_all_images(PATH + "train/"))

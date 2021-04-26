@@ -8,7 +8,7 @@ import tqdm
 import requests
 import os
 from pathlib import Path
-
+from glob import glob
 
 def get_bird_dataset() -> None: # destination: str = "./data/bird_dataset.zip"
     def get_confirm_token(response):
@@ -28,6 +28,9 @@ def get_bird_dataset() -> None: # destination: str = "./data/bird_dataset.zip"
         if token:
             params = {"id": file_id, "confirm": token}
             response = session.get(URL, params=params, stream=True)
+        # create dir if not exists
+        if not os.path.exists("data/"):
+            os.mkdir("data/")
         # Save
         CHUNK_SIZE = 32768
         with open(destination, "wb") as f:
@@ -40,21 +43,56 @@ def get_bird_dataset() -> None: # destination: str = "./data/bird_dataset.zip"
 
 
 # bird dataset to Image && BB object
-def import_bird_dataset():
-    train, test, val = 0, 0, 0
-    # get gt's from file/folder
-    #
+def import_bird_dataset(path_to_bird_dataset):
+    def create_images(gt_images, jsons):
+        # Test
+        for json in jsons:
+            im = Image(
+                filename=json['frame'],
+                image_width=json['imgWidth'],
+                image_height=json['imgHeight']
+            )
+            for bb in json['objects']:
+                im.add_bb(
+                    BoundingBox(
+                    x=bb['boundingbox'][0],
+                    y=bb['boundingbox'][1],
+                    w=bb['boundingbox'][2],
+                    h=bb['boundingbox'][3],
+                    confidence=1, # since gt, confidence = 1 (useless)
+                    coordinates_format=CoordinatesFormat.XYXY,
+                    coordinates_values=CoordinatesValues.ABSOLUTE,
+                    # class_id=bb[],
+                    class_name=bb['label'],
+                    )
+                )
+            gt_images.append(im)
 
-    return train, test, val
+    from ioweyou.utils import get_json
+    gt_images_test, gt_images_train, gt_images_val = [], [], []
+    # get gt's from file/folder
+    test_jsons = [get_json(e) for e in glob("".join([path_to_bird_dataset, "test/*.json"]))]
+    train_jsons = [get_json(e) for e in glob("".join([path_to_bird_dataset, "train/*.json"]))]
+    val_jsons = [get_json(e) for e in glob("".join([path_to_bird_dataset, "val/*.json"]))]
+    # Test
+    create_images(gt_images_test, test_jsons)
+    # Train
+    create_images(gt_images_train, test_jsons)
+    # Val
+    create_images(gt_images_val, val_jsons)
+    
+    return gt_images_test, gt_images_train, gt_images_val
 
 
 def parse_yolov4_results_json(path: Path) -> List[Image]:
     with open(path, 'r') as f:
         output_data = json.load(f)  # : List[Dict]
     # test List:
-    gt_images = []
+    dt_images = []
     for output_image in output_data:
-        image = Image(output_image['filename'])
+        # print(output_image['filename'].split('/')[-1][:-4])
+        # exit()
+        image = Image(output_image['filename'].split('/')[-1][:-4])
         for output_bb in output_image['objects']:
             bb = BoundingBox(
                 x=output_bb['relative_coordinates']['center_x'],
@@ -68,5 +106,5 @@ def parse_yolov4_results_json(path: Path) -> List[Image]:
                 class_name=output_bb['name'],
             )
             image.add_bb(bb)
-        gt_images.append(image)
-    return gt_images
+        dt_images.append(image)
+    return dt_images
