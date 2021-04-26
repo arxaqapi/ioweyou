@@ -31,6 +31,7 @@ class BoundingBox:
 
     def iou(self, b: 'BoundingBox') -> float:
         assert b.coordinates_format == CoordinatesFormat.XYWH and self.coordinates_format == CoordinatesFormat.XYWH
+        assert b.coordinates_values == self.coordinates_values
         bb_one = from_xywh_to_xyxy(self)
         bb_two = from_xywh_to_xyxy(b)
         x_a: float = max(bb_one[0], bb_two[0])
@@ -234,3 +235,25 @@ def display_confusion_matrix(TP: int, FP: int, FN: int, TN: int=0) -> None:
     ax.yaxis.set_ticklabels([1, 0])
     plt.show()
     # return ax
+
+
+def precision_recall_curve(
+        gt_images: List[Image],
+        det_images: List[Image],
+        confidence_threshold_values=[0, 0.25, 0.5, 0.75, 1],
+        display=False
+        ) -> Tuple[List[float]]:
+    import matplotlib.pyplot as plt
+    precicions, recalls = [], []
+    for threshold in confidence_threshold_values:
+        TP, FP, FN = evaluate_model(gt_images, det_images, confidence_threshold=threshold)
+        print(TP, FP, FN)
+        p, r = get_precision_recall(TP, FP, FN)
+        precicions.append(p)
+        recalls.append(r)
+    if display == True:
+        plt.xlabel("Recall")
+        plt.ylabel("Precision")
+        plt.plot(recalls, precicions, 'r')
+        plt.show()
+    return precicions, recalls
