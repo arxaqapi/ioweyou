@@ -115,12 +115,41 @@ class Image:
             bb.h = bb.h / self.image_height 
             bb.coordinates_values = CoordinatesValues.RELATIVE
         return verification
+    
+    def internal_from_xywh_to_xyxy(self) -> None:
+        for bb in self.bounding_boxes:
+            assert bb.coordinates_format == CoordinatesFormat.XYWH
+            x, y, w, h = bb.x, bb.y, bb.w, bb.h
+            bb.x -= w/2
+            bb.y -= h/2
+            bb.w = x + w/2
+            bb.h = y + h/2
+            bb.coordinates_format = CoordinatesFormat.XYXY
+    
+    def internal_from_xyxy_to_xywh(self) -> None:
+        for bb in self.bounding_boxes:
+            assert bb.coordinates_format == CoordinatesFormat.XYXY
+            x, y, x2, y2 = bb.x, bb.y, bb.w, bb.h
+            bb.x = (x2 - x) / 2 + x
+            bb.y = (y2 - y) / 2 + y
+            bb.w = x2 - x
+            bb.h = y2 - y
+            bb.coordinates_format = CoordinatesFormat.XYWH
 
+    def get_wh_from_gt(self, gt_images: List['Image']):
+        for gti in gt_images:
+            if self.filename == gti.filename:
+                self.image_width = gti.image_width
+                self.image_height = gti.image_height
+                break 
+        if self.image_height == None or self.image_width == None:
+            raise RuntimeError("Height and width not found in ground truth images")
 
 # functions operating on Image and BboundingBox classes
 
 def from_xywh_to_xyxy(bb: 'BoundingBox') -> None:
-    return [bb.x - bb.w/2, bb.y - bb.h/2, bb.x + bb.w/2, bb.y + bb.h/2]
+    x, y, w, h = bb.x, bb.y, bb.w, bb.h
+    return [x - w/2, y - h/2, x + w/2, y + h/2]
 
 # : list[Image]
 def _get_corresponding_gt_image(gt_images: List[Image], name: str) -> Image:

@@ -60,6 +60,27 @@ def test_get_bird_dataset():
     from ioweyou.interface import get_bird_dataset
     get_bird_dataset()
 
+
+def test_internal_from__to__():
+    from ioweyou.BoundingBox import BoundingBox, Image
+    from ioweyou.CoordinatesHandler import CoordinatesFormat, CoordinatesValues
+    bb = BoundingBox(
+        # x=500, y=300, w=400, h=200,
+        x=300, y=200, w=700, h=400,
+        confidence=0.7,
+        coordinates_values=CoordinatesValues.ABSOLUTE,
+        coordinates_format=CoordinatesFormat.XYXY,
+    )
+    im = Image(filename='test', image_width=1000, image_height=600)
+    im.add_bb(bb)
+    print(im)
+    im.internal_from_xyxy_to_xywh()
+    print(im)
+    im.internal_from_xywh_to_xyxy()
+    print(im)
+
+
 test_evaluate_model()
 test_yolov4_interface()
 test_get_bird_dataset()
+test_internal_from__to__()
