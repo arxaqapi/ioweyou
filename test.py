@@ -81,7 +81,7 @@ def test_internal_from__to__():
 
 def test_create_bird_dataset_index():
     from ioweyou.utils import create_bird_dataset_index
-    create_bird_dataset_index("data/bird_dataset/")
+    test, train, val = create_bird_dataset_index("data/bird_dataset/")
 
 
 test_evaluate_model()
