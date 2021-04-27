@@ -31,6 +31,7 @@ def create_bird_dataset_index(path_to_bird_dataset: str) -> Tuple[List[str], Lis
             os.remove(fp)
         index_list = get_all_images(path_to_bird_dataset + f"{name}/")
         indexes.append(to_file(file_path=fp, img_list=index_list))
+    indexes = list(map(lambda index: [img[:-1] for img in index], indexes))
     return indexes[0], indexes[1], indexes[2]
 
 
