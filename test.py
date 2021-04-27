@@ -79,8 +79,13 @@ def test_internal_from__to__():
     im.internal_from_xywh_to_xyxy()
     print(im)
 
+def test_create_bird_dataset_index():
+    from ioweyou.utils import create_bird_dataset_index
+    create_bird_dataset_index("data/bird_dataset/")
+
 
 test_evaluate_model()
 test_yolov4_interface()
 test_get_bird_dataset()
 test_internal_from__to__()
+test_create_bird_dataset_index()
