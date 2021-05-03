@@ -30,7 +30,8 @@ class BoundingBox:
         return f"BoundingBox: ~[{self.x=}, {self.y=}, {self.w=}, {self.h=}], ~{self.confidence=}"
 
     def iou(self, b: 'BoundingBox') -> float:
-        assert b.coordinates_format == CoordinatesFormat.XYWH and self.coordinates_format == CoordinatesFormat.XYWH
+        assert b.coordinates_format == CoordinatesFormat.XYWH
+        assert self.coordinates_format == CoordinatesFormat.XYWH
         assert b.coordinates_values == self.coordinates_values
         bb_one = from_xywh_to_xyxy(self)
         bb_two = from_xywh_to_xyxy(b)
@@ -182,7 +183,6 @@ def evaluate_model(
     TP, FP = 0, 0
     # detected bboxes
     for det_image in det_images:
-        # TODO # gt for det_image
         gt_image: Image = _get_corresponding_gt_image(gt_images, det_image.filename)
 
         # for all bb in detected_obj
@@ -247,7 +247,6 @@ def precision_recall_curve(
     precicions, recalls = [], []
     for threshold in confidence_threshold_values:
         TP, FP, FN = evaluate_model(gt_images, det_images, confidence_threshold=threshold)
-        print(TP, FP, FN)
         p, r = get_precision_recall(TP, FP, FN)
         precicions.append(p)
         recalls.append(r)
