@@ -84,8 +84,28 @@ def test_create_bird_dataset_index():
     test, train, val = create_bird_dataset_index("data/bird_dataset/")
 
 
-test_evaluate_model()
-test_yolov4_interface()
-test_get_bird_dataset()
-test_internal_from__to__()
-test_create_bird_dataset_index()
+def test_serialize_objects():
+    from ioweyou.BoundingBox import BoundingBox
+    from ioweyou.CoordinatesHandler import CoordinatesFormat, CoordinatesValues
+    bb = BoundingBox(
+            # x=500, y=300, w=400, h=200,
+            x=300, y=200, w=700, h=400,
+            confidence=0.7,
+            coordinates_values=CoordinatesValues.ABSOLUTE,
+            coordinates_format=CoordinatesFormat.XYXY,
+        )
+
+    import pickle
+    with open('test.pickle', 'wb') as f:
+        pickle.dump(bb, f)
+
+    with open('test.pickle', 'rb') as f:
+        returned = pickle.load(f)
+        print(returned)
+
+
+# test_evaluate_model()
+# test_yolov4_interface()
+# test_get_bird_dataset()
+# test_internal_from__to__()
+# test_create_bird_dataset_index()

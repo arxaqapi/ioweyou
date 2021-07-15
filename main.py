@@ -1,11 +1,4 @@
-# from ioweyou.CoordinatesHandler import CoordinatesFormat, CoordinatesValues
-# from ioweyou.BoundingBox import BoundingBox, Image
-# from ioweyou.utils import get_all_images, to_file
-
-
-
 from ioweyou.BoundingBox import evaluate_model
-
 
 PATH = "data/bird_dataset/"
 # to_file(PATH + "test_index.txt", get_all_images(PATH + "test/"))
@@ -32,7 +25,9 @@ def evaluate_yolov4():
     print("recall")
     print(r)
     print(f"map = {mAP(precisions=p, recalls=r)}")
-    # print(zip(p, r))
+    import pickle
+    with open('yolov4_infered_bbxs.pickle', 'wb') as f:
+        pickle.dump(dt, f)
 
 
 
@@ -40,4 +35,18 @@ def evaluate_yolov4():
 def evaluate_yolov3():
     pass
 
+
+def evaluate_efficientdet():
+    from ioweyou.BoundingBox import BoundingBox, Image
+    from ioweyou.CoordinatesHandler import CoordinatesFormat, CoordinatesValues
+    from typing import List
+    import pickle
+
+    with open('efficiendet_infered_bbxs.pickle', 'rb') as f:
+        img_list: List[Image]= pickle.load(f)
+
+    print(img_list[0].bounding_boxes[0].coordinates_format)
+
+
+# evaluate_efficientdet()
 evaluate_yolov4()
